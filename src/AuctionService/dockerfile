@@ -2,14 +2,36 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 as build
 WORKDIR /app
 EXPOSE 80
 
-# copy all .csproj files and restore as distinct layers. Use of the same COPY command
-# for every dockerfile in the project to take advantage of docker caching
+#ENV HTTP_PROXY https://sdsaqhdks:qmffnzhxm%4012@105.1.100.11:9090
+#ENV HTTPS_PROXY http://sdsaqhdks:qmffnzhxm%4012@105.1.100.11:9090
+
+#RUN apt-get update && apt-get install -y ca-certificates curl openssl 
+
+COPY cacert.pem cacert.pem
+
+#RUN curl -w %{certs} https://api.nuget.org/v3/index.json > cacert.pem
+#RUN chmod 644 /etc/ssl/certs/ca-certificates.crt
+#RUN update-ca-certificates
+RUN apt-get update && apt-get install --reinstall ca-certificates -y curl openssl \
+    && cp cacert.pem /usr/local/share/ca-certificates/cacert.crt \
+    && update-ca-certificates
+
+RUN cat /usr/local/share/ca-certificates/cacert.crt >> /etc/ssl/certs/ca-certificates.crt
+RUN curl -I https://api.nuget.org/v3/index.json
+#RUN ls -al /usr/local/share/ca-certificates/
+#RUN chmod 644 /usr/local/share/ca-certificates/cacert.crt
+#RUN curl --tlsv1.2 -x http://sdsaqhdks:qmffnzhxm%4012@105.1.100.11:9090 https://api.nuget.org/v3/index.json
+
+#RUN cat /usr/local/share/ca-certificates/cacert.crt >> /etc/ssl/certs/ca-certificates.crt
+#RUN cat /etc/ssl/certs/ca-certificates.crt
+
 COPY Carsties.sln Carsties.sln
 COPY src/AuctionService/AuctionService.csproj src/AuctionService/AuctionService.csproj
 COPY src/SearchService/SearchService.csproj src/SearchService/SearchService.csproj
 COPY src/GatewayService/GatewayService.csproj src/GatewayService/GatewayService.csproj
 COPY src/Contracts/Contracts.csproj src/Contracts/Contracts.csproj
 COPY src/IdentityService/IdentityService.csproj src/IdentityService/IdentityService.csproj
+
 
 # Restore package deps
 RUN dotnet restore Carsties.sln
