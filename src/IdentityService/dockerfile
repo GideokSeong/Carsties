@@ -18,7 +18,7 @@ RUN dotnet restore Carsties.sln
 COPY src/IdentityService src/IdentityService
 COPY src/Contracts src/Contracts
 WORKDIR  /app/src/IdentityService
-RUN dotnet publish -c Debug -o /app/src/out
+RUN dotnet publish -c release -o /app/src/out
 
 # build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
