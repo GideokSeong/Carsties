@@ -1,4 +1,7 @@
 /** @type {import('next').NextConfig} */
+import { setGlobalDispatcher, Agent } from 'undici';
+
+
 
 const nextConfig = {
     
@@ -8,8 +11,11 @@ const nextConfig = {
         }
     },
     images: {
+        unoptimized: true,
+        loader: 'default',
+        minimumCacheTTL: 60,
         remotePatterns: [
-            {protocol: 'https', hostname:'cdn.pixabay.com', pathname: '/**'}
+            {protocol: 'https', hostname:'cdn.pixabay.com', port: '', pathname: '/**'}
         ]
     }
 };
